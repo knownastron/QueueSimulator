@@ -23,8 +23,8 @@ void BankQueue::showpq(std::priority_queue <Event> gq)
   std::priority_queue <Event> g = gq;
   while (!g.empty())
   {
-    //    std::cout << "  " << g.top().timeOfEvent_ ;
-    std::cout << "  " << g.top().duration_ ;
+    //    std::cout << "  " << g.top().timeOfEvent ;
+    std::cout << "  " << g.top().duration ;
     g.pop();
   }
   std::cout << '\n';
@@ -51,19 +51,19 @@ std::vector<double> BankQueue::run() {
   while (!eventQ.empty()) {
     Event currentEvent = eventQ.top();
     eventQ.pop();
-    runningTime = currentEvent.timeOfEvent_;
+    runningTime = currentEvent.timeOfEvent;
     if (runningTime > TOTAL_TIME) {
       break; }
     
     // check if event is arrival
-    if (currentEvent.eventType_ == 0) {
+    if (currentEvent.eventType == 0) {
       std::optional<int> emptyServiceCounter = getEmptyServiceCounter(serviceCounters);
       
       // if service counter is empty, serve customer
       if (emptyServiceCounter.has_value()) {
         serveCustomer(eventQ, serviceCounters, currentEvent, emptyServiceCounter.value(), runningTime);
-        int waitTimeToAdd = runningTime - currentEvent.timeOfEvent_ + currentEvent.duration_;
-        if (runningTime + currentEvent.duration_ <= TOTAL_TIME) {
+        int waitTimeToAdd = runningTime - currentEvent.timeOfEvent + currentEvent.duration;
+        if (runningTime + currentEvent.duration <= TOTAL_TIME) {
           waitTimes.push_back(waitTimeToAdd);
         }
         // if service counters are full, customer waits in queue
@@ -75,16 +75,16 @@ std::vector<double> BankQueue::run() {
     
     
     // check if event is a finished type
-    if (currentEvent.eventType_ == 1) {
-      serviceCounters[currentEvent.line_] = false; // set service counter to available
+    if (currentEvent.eventType == 1) {
+      serviceCounters[currentEvent.line] = false; // set service counter to available
       
       // if there is someone in the queue, serve them at this newly available counter
       if (!bankLine.empty()) {
         Event firstInQueue = bankLine.front();
         bankLine.pop();
-        serveCustomer(eventQ, serviceCounters, firstInQueue, currentEvent.line_, runningTime);
-        if (runningTime + firstInQueue.duration_ <= TOTAL_TIME) {
-          waitTimes.push_back(runningTime - firstInQueue.timeOfEvent_ + firstInQueue.duration_);
+        serveCustomer(eventQ, serviceCounters, firstInQueue, currentEvent.line, runningTime);
+        if (runningTime + firstInQueue.duration <= TOTAL_TIME) {
+          waitTimes.push_back(runningTime - firstInQueue.timeOfEvent + firstInQueue.duration);
         }
       }
     }
@@ -126,7 +126,7 @@ void BankQueue::populateArrivals(std::priority_queue<Event> &eventQ, double cust
 void BankQueue::serveCustomer(std::priority_queue<Event> &eventQ, bool serviceCounters[], Event &currentEvent, int lineNumber, \
                               int runningTime) {
   serviceCounters[lineNumber] = true;
-  Event finishEvent = Event(runningTime + currentEvent.duration_, 1, -1);
-  finishEvent.line_ = lineNumber;
+  Event finishEvent = Event(runningTime + currentEvent.duration, 1, -1);
+  finishEvent.line = lineNumber;
   eventQ.push(finishEvent);
 }

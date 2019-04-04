@@ -15,7 +15,7 @@ void showpq(std::priority_queue <Event> gq)
   std::priority_queue <Event> g = gq;
   while (!g.empty())
     {
-      std::cout << "  " << g.top().timeOfEvent_ ;
+      std::cout << "  " << g.top().timeOfEvent ;
       g.pop();
     }
   std::cout << '\n';

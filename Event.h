@@ -9,12 +9,12 @@
 
 class Event {
  public:
-  Event(int timeOfEvent, int eventType, int duration_);
-  friend bool operator<(const Event& lhs, const Event& rhs) { return lhs.timeOfEvent_ > rhs.timeOfEvent_; }
-  int timeOfEvent_; // in seconds
-  int eventType_; //0 for arrival, 1 for
-  int duration_; // in seconds
-  int line_;
+  Event(int timeOfEvent, int eventType, int duration);
+  friend bool operator<(const Event& lhs, const Event& rhs) { return lhs.timeOfEvent > rhs.timeOfEvent; }
+  int timeOfEvent; // in seconds
+  int eventType; //0 for arrival, 1 for
+  int duration; // in seconds
+  int line;
 
  private:
 
