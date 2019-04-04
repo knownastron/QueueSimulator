@@ -56,7 +56,7 @@ std::vector<double> BankQueue::run() {
       break; }
     
     // check if event is arrival
-    if (currentEvent.eventType == 0) {
+    if (currentEvent.eventType == ARRIVAL) {
       std::optional<int> emptyServiceCounter = getEmptyServiceCounter(serviceCounters);
       
       // if service counter is empty, serve customer
@@ -75,7 +75,7 @@ std::vector<double> BankQueue::run() {
     
     
     // check if event is a finished type
-    if (currentEvent.eventType == 1) {
+    if (currentEvent.eventType == FINISH) {
       serviceCounters[currentEvent.line] = false; // set service counter to available
       
       // if there is someone in the queue, serve them at this newly available counter
@@ -117,7 +117,7 @@ void BankQueue::populateArrivals(std::priority_queue<Event> &eventQ, double cust
   for (int i = 0; i < numCustomers; i++) {
     int timeOfArrival = rand() % totalTime;
     double serveDuration = ((double) rand() /RAND_MAX) * serviceTime * 60;
-    Event newEvent = Event(timeOfArrival, 0, serveDuration);
+    Event newEvent = Event(timeOfArrival, ARRIVAL, serveDuration);
     eventQ.push(newEvent);
   }
 }
@@ -126,7 +126,7 @@ void BankQueue::populateArrivals(std::priority_queue<Event> &eventQ, double cust
 void BankQueue::serveCustomer(std::priority_queue<Event> &eventQ, bool serviceCounters[], Event &currentEvent, int lineNumber, \
                               int runningTime) {
   serviceCounters[lineNumber] = true;
-  Event finishEvent = Event(runningTime + currentEvent.duration, 1, -1);
+  Event finishEvent = Event(runningTime + currentEvent.duration, FINISH, -1);
   finishEvent.line = lineNumber;
   eventQ.push(finishEvent);
 }

@@ -18,8 +18,8 @@ void SupermarketQueue::showpq(std::priority_queue <Event> gq)
   std::priority_queue <Event> g = gq;
   while (!g.empty())
     {
-      //    std::cout << "  " << g.top().timeOfEvent_ ;
-      std::cout << "  " << g.top().duration_ ;
+      //    std::cout << "  " << g.top().timeOfEvent ;
+      std::cout << "  " << g.top().duration ;
       g.pop();
     }
   std::cout << '\n';
@@ -48,22 +48,22 @@ std::vector<double> SupermarketQueue::run() {
   while (!eventQ.empty()) {
     Event currentEvent = eventQ.top();
     eventQ.pop();
-    int diff = currentEvent.timeOfEvent_ - runningTime;
-    runningTime = currentEvent.timeOfEvent_;
+    int diff = currentEvent.timeOfEvent - runningTime;
+    runningTime = currentEvent.timeOfEvent;
     if (runningTime > TOTAL_TIME) { break; }
     updateLineTimes(lineTimes, diff);
     // check if event is arrival
-    if (currentEvent.eventType_ == 0) {
+    if (currentEvent.eventType == 0) {
       customerArrival(eventQ, lines, lineTimes, currentEvent, runningTime);
     }
 
     // check if event is a finished type
-    if (currentEvent.eventType_ == 1) {
-      assert(!lines[currentEvent.line_].empty());
-      Event finishedCustomer = lines[currentEvent.line_].front();
-      lines[currentEvent.line_].pop();
-      lineTimes[currentEvent.line_] -= finishedCustomer.duration_ ; // reduce the aggregate customer time of line
-      waitTimes.push_back(runningTime - finishedCustomer.timeOfEvent_);
+    if (currentEvent.eventType == 1) {
+      assert(!lines[currentEvent.line].empty());
+      Event finishedCustomer = lines[currentEvent.line].front();
+      lines[currentEvent.line].pop();
+      //      lineTimes[currentEvent.line] -= finishedCustomer.duration ; // reduce the aggregate customer time of line
+      waitTimes.push_back(runningTime - finishedCustomer.timeOfEvent);
     }
   }
   return waitTimes;
@@ -107,11 +107,11 @@ void SupermarketQueue::populateArrivals(std::priority_queue<Event> &eventQ, doub
 
 void SupermarketQueue::customerArrival(std::priority_queue<Event> &eventQ, std::queue<Event> lines[], int lineTimes[], Event &currentEvent, int runningTime) {
   int shortestQueue = getShortestLine(lineTimes); // get the line with the shortest current wait time
-  currentEvent.line_ = shortestQueue; // set the internal value of the customer's line to shorestLine
+  currentEvent.line = shortestQueue; // set the internal value of the customer's line to shorestLine
   lines[shortestQueue].push(currentEvent); // put customer in the shortest line
-  lineTimes[shortestQueue] += currentEvent.duration_; // add the duration of the current customer to the total time of the line
+  lineTimes[shortestQueue] += currentEvent.duration; // add the duration of the current customer to the total time of the line
   Event finishEvent = Event(runningTime + lineTimes[shortestQueue], 1, -1);
-  finishEvent.line_ = shortestQueue;
+  finishEvent.line = shortestQueue;
   eventQ.push(finishEvent);
 }
 

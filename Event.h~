@@ -7,17 +7,19 @@
 
 #include <optional>
 
+enum EventType {ARRIVAL, FINISH};
+
 class Event {
  public:
   Event(int timeOfEvent, int eventType, int duration);
   friend bool operator<(const Event& lhs, const Event& rhs) { return lhs.timeOfEvent > rhs.timeOfEvent; }
   int timeOfEvent; // in seconds
-  int eventType; //0 for arrival, 1 for
+  EventType eventType; //0 for arrival, 1 for
   int duration; // in seconds
   int line;
 
  private:
-
+
 
 };
 

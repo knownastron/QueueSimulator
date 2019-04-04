@@ -68,5 +68,6 @@ int main(int argc, char **argv) {
   std::cout << "10th %tile: "  << percentile(supermarketWaitTimes, .10)/60 << std::endl;
   std::cout << "50th %tile: " << percentile(supermarketWaitTimes, .50)/60 << std::endl;
   std::cout << "90th %tile: " << percentile(supermarketWaitTimes, .90)/60 << std::endl;
+
   return 0;
 }

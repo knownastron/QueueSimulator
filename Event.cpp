@@ -7,7 +7,7 @@
 
 
 
-Event::Event(int timeOfEvent, int eventType, int duration) {
+Event::Event(int timeOfEvent, EventType eventType, int duration) {
   this->timeOfEvent = timeOfEvent; // in seconds
   this->eventType = eventType;
   this->duration = duration; // in seconds
