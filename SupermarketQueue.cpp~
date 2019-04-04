@@ -98,7 +98,7 @@ void SupermarketQueue::populateArrivals(std::priority_queue<Event> &eventQ, doub
   for (int i = 0; i < numCustomers; i++) {
     int timeOfArrival = rand() % totalTime;
     double serveDuration = ((double) rand() /RAND_MAX) * serviceTime * 60;
-    Event newEvent = Event(timeOfArrival, 0, serveDuration);
+    Event newEvent = Event(timeOfArrival, ARRIVAL, serveDuration);
     eventQ.push(newEvent);
   }
 }
@@ -110,7 +110,7 @@ void SupermarketQueue::customerArrival(std::priority_queue<Event> &eventQ, std::
   currentEvent.line = shortestQueue; // set the internal value of the customer's line to shorestLine
   lines[shortestQueue].push(currentEvent); // put customer in the shortest line
   lineTimes[shortestQueue] += currentEvent.duration; // add the duration of the current customer to the total time of the line
-  Event finishEvent = Event(runningTime + lineTimes[shortestQueue], 1, -1);
+  Event finishEvent = Event(runningTime + lineTimes[shortestQueue], FINISH, -1);
   finishEvent.line = shortestQueue;
   eventQ.push(finishEvent);
 }

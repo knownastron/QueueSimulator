@@ -53,12 +53,12 @@ std::vector<double> SupermarketQueue::run() {
     if (runningTime > TOTAL_TIME) { break; }
     updateLineTimes(lineTimes, diff);
     // check if event is arrival
-    if (currentEvent.eventType == 0) {
+    if (currentEvent.eventType == ARRIVAL) {
       customerArrival(eventQ, lines, lineTimes, currentEvent, runningTime);
     }
 
     // check if event is a finished type
-    if (currentEvent.eventType == 1) {
+    if (currentEvent.eventType == FINISH) {
       assert(!lines[currentEvent.line].empty());
       Event finishedCustomer = lines[currentEvent.line].front();
       lines[currentEvent.line].pop();
