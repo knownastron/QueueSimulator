@@ -1,0 +1,125 @@
+//
+// Created by Jason Tran on 2019-04-01.
+//
+
+#include "SupermarketQueue.h"
+
+#include <random>
+#include <iostream>
+
+SupermarketQueue::SupermarketQueue(double customerPerMinute, double serviceTime, int seed){
+  customerPerMinute_ = customerPerMinute;
+  serviceTime_ = serviceTime;
+  seed_ = seed;
+}
+
+void SupermarketQueue::showpq(std::priority_queue <Event> gq)
+{
+  std::priority_queue <Event> g = gq;
+  while (!g.empty())
+    {
+      //    std::cout << "  " << g.top().timeOfEvent_ ;
+      std::cout << "  " << g.top().duration_ ;
+      g.pop();
+    }
+  std::cout << '\n';
+}
+
+std::vector<double> SupermarketQueue::run() {
+
+
+  const long TOTAL_TIME = 43200; // 12 hours = 43200 seconds
+  long runningTime = 0;
+
+  srand(seed_);
+  const double customerPerHour = customerPerMinute_ * 60;
+  const double customerPerDay = customerPerHour * 12;
+
+  std::priority_queue<Event> eventQ;
+  populateArrivals(eventQ, customerPerDay, seed_, TOTAL_TIME, serviceTime_);
+
+  //  showpq(eventQ); ////////////// debug purposes only
+
+  std::queue<Event> lines[6];// = {new std::queue<Event>, new std::queue<Event>, new std::queue<Event>, new std::queue<Event>, new std::queue<Event>, new std::queue<Event>};
+  int lineTimes[6] = {0, 0, 0, 0, 0, 0};
+  std::vector<double> waitTimes;
+
+
+  while (!eventQ.empty()) {
+    Event currentEvent = eventQ.top();
+    eventQ.pop();
+    int diff = currentEvent.timeOfEvent_ - runningTime;
+    runningTime = currentEvent.timeOfEvent_;
+    if (runningTime > TOTAL_TIME) { break; }
+    updateLineTimes(lineTimes, diff);
+    // check if event is arrival
+    if (currentEvent.eventType_ == 0) {
+      customerArrival(eventQ, lines, lineTimes, currentEvent, runningTime);
+    }
+
+    // check if event is a finished type
+    if (currentEvent.eventType_ == 1) {
+      assert(!lines[currentEvent.line_].empty());
+      Event finishedCustomer = lines[currentEvent.line_].front();
+      lines[currentEvent.line_].pop();
+      //      lineTimes[currentEvent.line_] -= finishedCustomer.duration_ ; // reduce the aggregate customer time of line
+      waitTimes.push_back(runningTime - finishedCustomer.timeOfEvent_);
+    }
+  }
+  return waitTimes;
+}
+
+
+int SupermarketQueue::getShortestLine(int lines[]) {
+  int minVal = INT_MAX;
+  int minLine = 0;
+
+  for (int i = 0; i < 6; i++) {
+    if (lines[i] == 0) {
+      return i;
+    }
+
+    if (lines[i] < minVal) {
+      minVal = lines[i];
+      minLine = i;
+    }
+  }
+
+  return minLine;
+}
+
+void SupermarketQueue::populateArrivals(std::priority_queue<Event> &eventQ, double customerPerDay, int seed, long totalTime, double serviceTime) {
+  std::default_random_engine generator;
+  generator.seed(seed);
+
+  std::poisson_distribution<int> distribution(customerPerDay);
+  int numCustomers = distribution(generator);
+
+  for (int i = 0; i < numCustomers; i++) {
+    int timeOfArrival = rand() % totalTime;
+    double serveDuration = ((double) rand() /RAND_MAX) * serviceTime * 60;
+    Event newEvent = Event(timeOfArrival, 0, serveDuration);
+    eventQ.push(newEvent);
+  }
+}
+
+
+
+void SupermarketQueue::customerArrival(std::priority_queue<Event> &eventQ, std::queue<Event> lines[], int lineTimes[], Event &currentEvent, int runningTime) {
+  int shortestQueue = getShortestLine(lineTimes); // get the line with the shortest current wait time
+  currentEvent.line_ = shortestQueue; // set the internal value of the customer's line to shorestLine
+  lines[shortestQueue].push(currentEvent); // put customer in the shortest line
+  lineTimes[shortestQueue] += currentEvent.duration_; // add the duration of the current customer to the total time of the line
+  Event finishEvent = Event(runningTime + lineTimes[shortestQueue], 1, -1);
+  finishEvent.line_ = shortestQueue;
+  eventQ.push(finishEvent);
+}
+
+void SupermarketQueue::updateLineTimes(int lineTimes[], int diff) {
+  for (int i = 0; i < 6; i++) {
+    assert(lineTimes[i] >= 0);
+    if (lineTimes[i] > 0) {
+      lineTimes[i] -= diff;
+    }
+  }
+}
